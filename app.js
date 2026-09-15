@@ -143,12 +143,21 @@ function copyGeneratedKeys() {
 }
 
 function saveKeys() {
-    if (generatedKeysCache.length === 0) return;
+    if (generatedKeysCache.length === 0) {
+        console.log("No keys to save");
+        return;
+    }
+    
+    // ✅ FIX: Make sure keysDatabase is an array
+    if (!Array.isArray(keysDatabase)) {
+        console.warn("keysDatabase was not an array, resetting to []", keysDatabase);
+        keysDatabase = [];
+    }
     
     keysDatabase.push(...generatedKeysCache);
     saveKeysToStorage();
     
-    showToast(`Saved ${generatedKeysCache.length} key(s) to database`, "success");
+    showToast(`Saved ${generatedKeysCache.length} key(s)`, "success");
     
     generatedKeysCache = [];
     document.getElementById("generatedKeys").classList.add("hidden");
