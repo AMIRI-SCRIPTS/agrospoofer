@@ -5,12 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AGRO-WARE | Admin Panel</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/png" href="AGRO LOGO.png">
+    <link rel="icon" type="image/png" href="assets/logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
+
+<!-- ============================================================
+     BACKGROUND EFFECTS
+     ============================================================ -->
+<div class="bg-gradient"></div>
+<div class="bg-grid"></div>
+<div class="bg-glow bg-glow-1"></div>
+<div class="bg-glow bg-glow-2"></div>
 
 <!-- ============================================================
      LOGIN SCREEN
@@ -21,7 +29,7 @@
         
         <div class="logo-wrapper">
             <div class="logo-glow"></div>
-            <img src="AGRO LOGO.png" alt="AGRO-WARE" class="logo">
+            <img src="assets/logo.png" alt="AGRO-WARE" class="logo">
         </div>
         
         <h1 class="brand"><span class="brand-accent">AGRO</span>-WARE</h1>
@@ -62,7 +70,7 @@
     <aside class="sidebar">
         <div class="sidebar-brand">
             <div class="brand-logo">
-                <img src="AGRO LOGO.png" alt="Logo">
+                <img src="assets/logo.png" alt="Logo">
             </div>
             <div class="brand-text">
                 <h2><span class="brand-accent">AGRO</span>-WARE</h2>
@@ -73,7 +81,7 @@
         <nav class="nav">
             <div class="nav-label">MAIN</div>
             
-            <a href="#" onclick="showPage('overview'); return false;" class="nav-item active" data-page="overview">
+            <a href="#" onclick="showPage('overview')" class="nav-item active" data-page="overview">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="7" height="9"></rect>
                     <rect x="14" y="3" width="7" height="5"></rect>
@@ -83,14 +91,14 @@
                 <span>Overview</span>
             </a>
             
-            <a href="#" onclick="showPage('generate'); return false;" class="nav-item" data-page="generate">
+            <a href="#" onclick="showPage('generate')" class="nav-item" data-page="generate">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
                 </svg>
                 <span>Generate Keys</span>
             </a>
             
-            <a href="#" onclick="showPage('manage'); return false;" class="nav-item" data-page="manage">
+            <a href="#" onclick="showPage('manage')" class="nav-item" data-page="manage">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                     <polyline points="14 2 14 8 20 8"></polyline>
@@ -102,7 +110,7 @@
             
             <div class="nav-label">SYSTEM</div>
             
-            <a href="#" onclick="showPage('settings'); return false;" class="nav-item" data-page="settings">
+            <a href="#" onclick="showPage('settings')" class="nav-item" data-page="settings">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="3"></circle>
                     <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
@@ -132,6 +140,7 @@
          ============================================================ -->
     <main class="main">
         
+        <!-- Top Bar -->
         <header class="topbar">
             <div class="topbar-title">
                 <h1 id="pageTitle">Overview</h1>
@@ -145,7 +154,9 @@
             </div>
         </header>
         
-        <!-- OVERVIEW -->
+        <!-- ============================================================
+             OVERVIEW PAGE
+             ============================================================ -->
         <div id="page-overview" class="page active">
             <div class="stats-grid">
                 <div class="stat-card stat-blue">
@@ -251,7 +262,9 @@
             </div>
         </div>
         
-        <!-- GENERATE -->
+        <!-- ============================================================
+             GENERATE PAGE
+             ============================================================ -->
         <div id="page-generate" class="page">
             <div class="card">
                 <div class="card-header">
@@ -338,7 +351,9 @@
             </div>
         </div>
         
-        <!-- MANAGE -->
+        <!-- ============================================================
+             MANAGE PAGE
+             ============================================================ -->
         <div id="page-manage" class="page">
             <div class="card">
                 <div class="toolbar">
@@ -383,14 +398,16 @@
                             </tr>
                         </thead>
                         <tbody id="keysTableBody">
-                            <tr><td colspan="6" style="text-align:center; padding:40px; color: var(--text-3);">Loading...</td></tr>
+                            <!-- Populated by JS -->
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
         
-        <!-- SETTINGS -->
+        <!-- ============================================================
+             SETTINGS PAGE
+             ============================================================ -->
         <div id="page-settings" class="page">
             <div class="card">
                 <div class="card-header">
@@ -402,7 +419,7 @@
                     <div class="form-field">
                         <label>GitHub Repository URL</label>
                         <input type="text" id="githubRepo" placeholder="https://github.com/username/repo">
-                        <small>Where your keys.json is hosted</small>
+                        <small>Where your keys.json will be hosted</small>
                     </div>
                     
                     <div class="form-field">
