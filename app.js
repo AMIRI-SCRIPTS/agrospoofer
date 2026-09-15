@@ -10,7 +10,7 @@ let keysDatabase = [];
 let generatedKeysCache = [];
 
 // ============================================================
-// LOGIN SYSTEM
+// LOGIN
 // ============================================================
 
 function login() {
@@ -22,7 +22,7 @@ function login() {
         showDashboard();
         errorEl.textContent = "";
     } else {
-        errorEl.textContent = "❌ Invalid password";
+        errorEl.textContent = "Invalid password";
         document.getElementById("passwordInput").value = "";
         document.getElementById("passwordInput").focus();
     }
@@ -40,34 +40,42 @@ function showDashboard() {
     updateStats();
 }
 
-// Check if already logged in
 window.addEventListener("DOMContentLoaded", () => {
     if (sessionStorage.getItem(SESSION_KEY) === "authenticated") {
         showDashboard();
     }
     
-    // Enter key for password
     document.getElementById("passwordInput").addEventListener("keypress", (e) => {
         if (e.key === "Enter") login();
     });
 });
 
 // ============================================================
-// PAGE NAVIGATION
+// NAVIGATION
 // ============================================================
 
+const PAGE_META = {
+    overview: { title: "Overview", subtitle: "Dashboard statistics and quick actions" },
+    generate: { title: "Generate Keys", subtitle: "Create new license keys for your users" },
+    manage: { title: "Manage Keys", subtitle: "View, search, and manage existing keys" },
+    settings: { title: "Settings", subtitle: "Configure your license system" }
+};
+
 function showPage(pageName) {
-    // Update nav
     document.querySelectorAll(".nav-item").forEach(item => {
         item.classList.toggle("active", item.dataset.page === pageName);
     });
     
-    // Update content
     document.querySelectorAll(".page").forEach(page => {
         page.classList.toggle("active", page.id === `page-${pageName}`);
     });
     
-    // Refresh data on certain pages
+    const meta = PAGE_META[pageName];
+    if (meta) {
+        document.getElementById("pageTitle").textContent = meta.title;
+        document.getElementById("pageSubtitle").textContent = meta.subtitle;
+    }
+    
     if (pageName === "manage") renderKeysTable();
     if (pageName === "overview") updateStats();
 }
@@ -86,7 +94,6 @@ function generateRandomHex(length) {
 }
 
 function generateKey(type) {
-    // Format: AGRO-PRO-2024-XXXX-XXXX-XXXX
     const year = new Date().getFullYear();
     return `AGRO-${type}-${year}-${generateRandomHex(4)}-${generateRandomHex(4)}-${generateRandomHex(4)}`;
 }
@@ -121,7 +128,6 @@ function generateKeys() {
         });
     }
     
-    // Show output
     const output = document.getElementById("keysOutput");
     output.innerHTML = generatedKeysCache
         .map(k => `<div class="key-item">${k.key}</div>`)
@@ -133,19 +139,17 @@ function generateKeys() {
 function copyGeneratedKeys() {
     const text = generatedKeysCache.map(k => k.key).join("\n");
     navigator.clipboard.writeText(text);
-    alert("✅ Keys copied to clipboard!");
+    showToast(`Copied ${generatedKeysCache.length} keys to clipboard`, "success");
 }
 
 function saveKeys() {
     if (generatedKeysCache.length === 0) return;
     
-    // Add to database
     keysDatabase.push(...generatedKeysCache);
     saveKeysToStorage();
     
-    alert(`✅ ${generatedKeysCache.length} key(s) saved!`);
+    showToast(`Saved ${generatedKeysCache.length} key(s) to database`, "success");
     
-    // Reset
     generatedKeysCache = [];
     document.getElementById("generatedKeys").classList.add("hidden");
     document.getElementById("genNote").value = "";
@@ -160,7 +164,11 @@ function saveKeys() {
 function loadKeys() {
     const stored = localStorage.getItem(KEYS_STORAGE);
     if (stored) {
-        keysDatabase = JSON.parse(stored);
+        try {
+            keysDatabase = JSON.parse(stored);
+        } catch (e) {
+            keysDatabase = [];
+        }
     }
     updateStats();
 }
@@ -186,7 +194,7 @@ function renderKeysTable() {
     });
     
     if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:40px; color: var(--text-muted);">No keys found</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:40px; color: var(--text-3);">No keys found</td></tr>`;
         return;
     }
     
@@ -200,13 +208,13 @@ function renderKeysTable() {
             <tr>
                 <td>${key.key}</td>
                 <td>${key.type}</td>
-                <td><span class="badge badge-${status}">${status.toUpperCase()}</span></td>
+                <td><span class="badge badge-${status}">${status}</span></td>
                 <td>${expiryText}</td>
-                <td>${key.hwid || "Not bound"}</td>
+                <td>${key.hwid || "—"}</td>
                 <td>
-                    <button class="action-btn" onclick="copyKey('${key.key}')">📋</button>
-                    <button class="action-btn" onclick="unbindKey('${key.key}')">🔓</button>
-                    <button class="action-btn danger" onclick="deleteKey('${key.key}')">🗑️</button>
+                    <button class="action-btn" onclick="copyKey('${key.key}')" title="Copy">📋</button>
+                    <button class="action-btn" onclick="unbindKey('${key.key}')" title="Unbind HWID">🔓</button>
+                    <button class="action-btn danger" onclick="deleteKey('${key.key}')" title="Delete">🗑️</button>
                 </td>
             </tr>
         `;
@@ -214,20 +222,19 @@ function renderKeysTable() {
 }
 
 function getKeyStatus(key) {
+    if (key.expiresAt && new Date(key.expiresAt) < new Date()) {
+        return "expired";
+    }
     if (key.hwid) {
-        if (key.expiresAt && new Date(key.expiresAt) < new Date()) {
-            return "expired";
-        }
         return "active";
     }
     if (key.used) return "used";
-    if (key.expiresAt && new Date(key.expiresAt) < new Date()) return "expired";
     return "unused";
 }
 
 function copyKey(keyString) {
     navigator.clipboard.writeText(keyString);
-    alert("✅ Key copied!");
+    showToast("Key copied to clipboard", "success");
 }
 
 function unbindKey(keyString) {
@@ -240,6 +247,7 @@ function unbindKey(keyString) {
         saveKeysToStorage();
         renderKeysTable();
         updateStats();
+        showToast("HWID unbound successfully", "success");
     }
 }
 
@@ -250,6 +258,7 @@ function deleteKey(keyString) {
     saveKeysToStorage();
     renderKeysTable();
     updateStats();
+    showToast("Key deleted", "success");
 }
 
 function filterKeys() {
@@ -260,6 +269,7 @@ function refreshKeys() {
     loadKeys();
     renderKeysTable();
     updateStats();
+    showToast("Keys refreshed", "info");
 }
 
 // ============================================================
@@ -276,7 +286,7 @@ function updateStats() {
     document.getElementById("statActive").textContent = active;
     document.getElementById("statBound").textContent = bound;
     document.getElementById("statExpired").textContent = expired;
-    document.getElementById("keyCount").textContent = `${total} key(s) loaded`;
+    document.getElementById("keyCount").textContent = `${total} key${total !== 1 ? 's' : ''}`;
 }
 
 // ============================================================
@@ -290,10 +300,11 @@ function exportKeys() {
     
     const a = document.createElement("a");
     a.href = url;
-    a.download = `agro_ware_keys_${Date.now()}.json`;
+    a.download = `keys.json`;
     a.click();
     
     URL.revokeObjectURL(url);
+    showToast("Database exported", "success");
 }
 
 function importKeys() {
@@ -313,10 +324,10 @@ function importKeys() {
                     saveKeysToStorage();
                     renderKeysTable();
                     updateStats();
-                    alert(`✅ Imported ${imported.length} keys`);
+                    showToast(`Imported ${imported.length} keys`, "success");
                 }
             } catch (err) {
-                alert("❌ Invalid JSON file");
+                showToast("Invalid JSON file", "error");
             }
         };
         
@@ -331,16 +342,74 @@ function importKeys() {
 // ============================================================
 
 function saveSettings() {
-    alert("✅ Settings saved");
+    showToast("Settings saved", "success");
 }
 
 function showGitHubInstructions() {
     alert(
         "To push keys to GitHub:\n\n" +
-        "1. Click 'Export Database'\n" +
+        "1. Click 'Export DB' on the Overview page\n" +
         "2. Go to your GitHub repo\n" +
-        "3. Upload the JSON file as 'keys.json'\n" +
+        "3. Replace keys.json with the exported file\n" +
         "4. Commit changes\n\n" +
         "Your client will fetch it automatically!"
     );
 }
+
+// ============================================================
+// TOAST NOTIFICATIONS
+// ============================================================
+
+function showToast(message, type = "info") {
+    const existing = document.querySelector(".toast");
+    if (existing) existing.remove();
+    
+    const toast = document.createElement("div");
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    
+    const colors = {
+        success: "#4ade80",
+        error: "#f87171",
+        info: "#60a5fa"
+    };
+    
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        padding: 14px 20px;
+        background: #17171f;
+        border: 1px solid ${colors[type]};
+        border-left: 3px solid ${colors[type]};
+        border-radius: 8px;
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 500;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        z-index: 9999;
+        animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: 'Inter', sans-serif;
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = "slideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1)";
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// Add animations
+const style = document.createElement("style");
+style.textContent = `
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateX(100px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideOut {
+        from { opacity: 1; transform: translateX(0); }
+        to { opacity: 0; transform: translateX(100px); }
+    }
+`;
+document.head.appendChild(style);
