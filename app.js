@@ -170,15 +170,45 @@ function saveKeys() {
 // KEY MANAGEMENT
 // ============================================================
 
-function loadKeys() {
-    const stored = localStorage.getItem(KEYS_STORAGE);
-    if (stored) {
-        try {
-            keysDatabase = JSON.parse(stored);
-        } catch (e) {
-            keysDatabase = [];
+async function loadKeys() {
+    console.log('Loading keys...');
+    
+    try {
+        const response = await fetch('keys.json?t=' + Date.now());
+        if (response.ok) {
+            const data = await response.json();
+            
+            // ✅ FIX: Handle different JSON shapes
+            if (Array.isArray(data)) {
+                keysDatabase = data;
+            } else if (data && Array.isArray(data.keys)) {
+                keysDatabase = data.keys;
+            } else if (data && typeof data === 'object') {
+                // Single key object → wrap in array
+                keysDatabase = Object.keys(data).length > 0 ? [data] : [];
+            } else {
+                keysDatabase = [];
+            }
+            
+            console.log('✅ Loaded', keysDatabase.length, 'keys from GitHub');
+            localStorage.setItem(KEYS_STORAGE, JSON.stringify(keysDatabase));
+        } else {
+            throw new Error('HTTP ' + response.status);
+        }
+    } catch (e) {
+        console.log('⚠️ GitHub fetch failed, using localStorage:', e.message);
+        const stored = localStorage.getItem(KEYS_STORAGE);
+        if (stored) {
+            try {
+                const parsed = JSON.parse(stored);
+                keysDatabase = Array.isArray(parsed) ? parsed : [];
+                console.log('📦 Loaded', keysDatabase.length, 'keys from localStorage');
+            } catch (e2) {
+                keysDatabase = [];
+            }
         }
     }
+    
     updateStats();
 }
 
