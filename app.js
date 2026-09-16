@@ -235,9 +235,16 @@ function renderKeysTable() {
     
     tbody.innerHTML = filtered.map(key => {
         const status = getKeyStatus(key);
-        const expiryText = key.expiresAt 
-            ? new Date(key.expiresAt).toLocaleDateString()
-            : "Never";
+        
+        // ✅ CHANGE: Show "Not activated" until first use
+        let expiryText = "Not activated";
+        if (key.activatedAt && key.expiresAt) {
+            expiryText = new Date(key.expiresAt).toLocaleDateString();
+        } else if (key.duration === 0) {
+            expiryText = "Lifetime";
+        } else if (key.duration) {
+            expiryText = `Starts on use (${key.duration}d)`;
+        }
         
         return `
             <tr>
