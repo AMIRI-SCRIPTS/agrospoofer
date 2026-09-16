@@ -257,14 +257,18 @@ function renderKeysTable() {
 }
 
 function getKeyStatus(key) {
+    // If key was never activated → "unused" (waiting for first use)
+    if (!key.activatedAt) {
+        return "unused";
+    }
+    
+    // If key has been activated → check if expired
     if (key.expiresAt && new Date(key.expiresAt) < new Date()) {
         return "expired";
     }
-    if (key.hwid) {
-        return "active";
-    }
-    if (key.used) return "used";
-    return "unused";
+    
+    // If activated and not expired → active
+    return "active";
 }
 
 function copyKey(keyString) {
