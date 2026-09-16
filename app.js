@@ -109,18 +109,14 @@ function generateKeys() {
     for (let i = 0; i < quantity; i++) {
         const key = generateKey(type);
         
-        let expiresAt = null;
-        if (duration > 0) {
-            const expDate = new Date();
-            expDate.setDate(expDate.getDate() + duration);
-            expiresAt = expDate.toISOString();
-        }
-        
+        // ✅ CHANGE: Don't set expiresAt on generation!
+        // It will be set when the user activates the key
         generatedKeysCache.push({
             key: key,
             type: type,
-            duration: duration,
-            expiresAt: expiresAt,
+            duration: duration,          // ← Duration in days (stored for later)
+            expiresAt: null,             // ← NULL until first use!
+            activatedAt: null,           // ← When user first used it
             hwid: null,
             used: false,
             generated: new Date().toISOString(),
