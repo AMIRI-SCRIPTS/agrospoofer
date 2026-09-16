@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "key": "AGRO-PRO-2026-C61F-BADF-BA5F",
+    "type": "PRO",
+    "duration": 30,
+    "expiresAt": null,
+    "activatedAt": null,
+    "hwid": null,
+    "used": false,
+    "generated": "2026-09-16T01:12:45.631Z",
+    "note": ""
+  }
+]
